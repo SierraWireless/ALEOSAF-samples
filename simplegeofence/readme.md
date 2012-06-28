@@ -84,13 +84,9 @@ This table will keep the current state of the application.
 Where:
 
 * `fence` is the current fence area. Later, a function will be implemented to allow the fence to be set.
-
 * `last_reported_position` is the last GPS point reported and is used to determine if the vehicle has moved beyond a minimum distance in order to be considered as a change. When a vehicle is sitting still, the GPS coordinates constantly "jitter", indicating small movements. So a new position is tested against the last position to determine if the vehicle is really moving.
-
 * `was_in_fence` notes whether the last position reported was inside or outside the fence. `true` = inside the fence.
-
 * `lat` and `long` are the current latitude and longitude values. If an update contains only the latitude, for example, then the `state.long` value did not change and is valid for the current position.
-
 * `fix` is the current state of the GPS fix which indicates whether valid location values are being received. Values are:
 `0` = No fix, while values > 0 indicate that enough satellite signals have been acquired to calculate valid positions.
 
