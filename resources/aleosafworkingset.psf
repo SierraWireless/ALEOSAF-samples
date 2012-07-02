@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+<provider id="org.eclipse.egit.core.GitProvider">
+<project reference="1.0,git://github.com/SierraWireless/ALEOSAF-samples.git,master,simplegeofence"/>
+</provider>
+<workingSets editPageId="org.eclipse.ui.resourceWorkingSetPage" id="1341220421266_3" label="ALEOSAF Samples" name="ALEOSAF Samples">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/simplegeofence" type="4"/>
+</workingSets>
+</psf>
