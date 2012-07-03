@@ -1,8 +1,11 @@
 ALEOSAF-samples
 ===============
 
-Code samples for ALEOS Application Framework:
+Code samples and tutorials available for ALEOS Application Framework:
 
+* Samples
+** [Device Parameter Access](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/deviceparmaccess)
+*Tutorials
 * [Simple Geo-Fence Tutorial](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/simplegeofence)
 
 Running the samples
