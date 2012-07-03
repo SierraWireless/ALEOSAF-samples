@@ -3,7 +3,7 @@ ALEOSAF-samples
 
 Code samples for ALEOS Application Framework:
 
-* Simple Geo-Fence Tutorial
+* [Simple Geo-Fence Tutorial](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/simplegeofence)
 
 Running the samples
 -------------------
