@@ -56,7 +56,7 @@ local pi_180_earth_radius = math.pi/180 * 6.371e6
 -- Compute approximate distance, in meters, between two points.
 -- (Earth is considered spherical, and the distance between two points
 -- small enough to approximate the arc between them as flat).
--- @function   [parent=#geoloc] distance
+-- @function [parent=#geoloc] distance
 -- @param #point p1 first point
 -- @param #point p2 second point
 -- @return #number Distance between p1 and p2, in meters.
@@ -97,7 +97,6 @@ end
 -- @function [parent=#point] distance
 -- @param #point
 -- @return #number
--- @usage geoloc.distance(apoint, anotherpoint)
 -- @usage apoint:distance(anotherpoint)
 point.distance = M.distance
 
@@ -107,7 +106,6 @@ point.distance = M.distance
 --
 -- @function [parent=#point] speed
 -- @return #number
--- @usage geoloc.speed(apoint, anotherpoint)
 -- @usage apoint:speed(anotherpoint)
 point.speed = M.speed
 
