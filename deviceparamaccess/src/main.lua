@@ -1,10 +1,9 @@
 --
--- ALEOS Variable Access sample.
--- (c) Sierra Wireless April 2012
+-- ALEOS AF Device Parameter Access sample.
 --
-local devicetree     = require 'devicetree'
-local sched          = require 'sched'
-local variableaccess = require 'variableaccess'
+local deviceparamaccess = require 'deviceparamaccess'
+local devicetree        = require 'devicetree'
+local sched             = require 'sched'
 
 --------------------------------------------------------------------------------
 -- Initialize the devicetree module, run all examples, cleanup and exit.
@@ -12,19 +11,19 @@ function main ()
 	assert (devicetree.init())
 	sched.wait(1)
 
-	variableaccess.example_read_variables()
+	deviceparamaccess.example_read_variables()
 	sched.wait(1)
 
-	variableaccess.example_set_variables()
+	deviceparamaccess.example_set_variables()
 	sched.wait(1)
 
-	local din_id = variableaccess.example_monitor_variable()
+	local din_id = deviceparamaccess.example_monitor_variable()
 	sched.wait(1)
 
-	variableaccess.example_monitor_several_variables()
+	deviceparamaccess.example_monitor_several_variables()
 	sched.wait(1)
 
-	variableaccess.example_monitor_passive_variables()
+	deviceparamaccess.example_monitor_passive_variables()
 	sched.wait(1)
 
 	print ("End of sample, cleaning up")

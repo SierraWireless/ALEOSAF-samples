@@ -1,24 +1,24 @@
 ---
--- ALEOS Variable Access sample.
--- (c) Sierra Wireless April 2012
+-- ALEOS AF Device Parameter Access sample.
 --
--- @module variableaccess
+-- @module deviceparameteraccess
+--
 local devicetree = require 'devicetree'
-local sched = require "sched"
-local os    = require "os"
+local sched      = require 'sched'
+local os         = require 'os'
 local M = {}
 
 --------------------------------------------------------------------------------
 -- Variable paths to be used
-local LAT 			= 'system.gps.latitude'
-local LON 			= 'system.gps.longitude'
-local SAT_CNT		= 'system.gps.sat_cnt'
-local SW_VER		= 'system.sw_info.fw_ver'
-local DEVICE_NAME 	= 'system.ddns.service.device_name'
-local PWR_IN		= 'system.io.powerin'
-local DIN1			= 'system.aleos.io.in1'
-local NET_STATE		= 'system.aleos.cellular.state'
-local RSSI			= 'system.cellular.link.rssi'
+local LAT         = 'system.gps.latitude'
+local LON         = 'system.gps.longitude'
+local SAT_CNT     = 'system.gps.sat_cnt'
+local SW_VER      = 'system.sw_info.fw_ver'
+local DEVICE_NAME = 'system.ddns.service.device_name'
+local PWR_IN      = 'system.io.powerin'
+local DIN1        = 'system.aleos.io.in1'
+local NET_STATE   = 'system.aleos.cellular.state'
+local RSSI        = 'system.cellular.link.rssi'
 
 --------------------------------------------------------------------------------
 -- Callback function for the GPS variables
@@ -40,7 +40,7 @@ end
 --------------------------------------------------------------------------------
 -- One time access of static variables
 --
--- @function [parent=#variableaccess] example_read_variables
+-- @function [parent=#deviceparameteraccess] example_read_variables
 function M.example_read_variables ()
 
     local dname  = devicetree.get (DEVICE_NAME)
@@ -56,7 +56,7 @@ end
 --------------------------------------------------------------------------------
 -- Change a variable's value, check that the change took effect.
 --
--- @function [parent=#variableaccess] example_set_variables
+-- @function [parent=#deviceparameteraccess] example_set_variables
 function M.example_set_variables ()
     local dname  = devicetree.get (DEVICE_NAME)
     print ("Device name =", dname)
@@ -78,7 +78,7 @@ end
 -- This is done through method:
 --    devicetree.register (list_of_variables, callback, passive_vars)
 --
--- @function [parent=#variableaccess] example_monitor_variable
+-- @function [parent=#deviceparameteraccess] example_monitor_variable
 -- @return A registration id, to be passed to devicetree.unregister in order to
 --  unsubscribe.
 -- @return #nil In case of error.
@@ -93,7 +93,7 @@ end
 -- Every time one of the variables change, the `"when_gps_changes"` callback is
 -- called with all the variables of the set that changed.
 --
--- @function [parent=#variableaccess] example_monitor_several_variables
+-- @function [parent=#deviceparameteraccess] example_monitor_several_variables
 function M.example_monitor_several_variables ()
     -- Subscribe to a set of variables
     print ("Registering GPS variables\n")
@@ -119,7 +119,7 @@ end
 -- Since net variables are passed as `"passive"` here,
 -- a change in the net variables won't trigger the callback.
 --
--- @function [parent=#variableaccess] example_monitor_passive_variables
+-- @function [parent=#deviceparameteraccess] example_monitor_passive_variables
 function M.example_monitor_passive_variables ()
     print ("Registering GPS variables and passive vars\n")
     local gps_variables = { LAT, LON, SAT_CNT }
