@@ -109,7 +109,6 @@ Where:
 ### Initial callback function implementation
 
 A simple implementation that demonstrates how to detect movements in and out of a fence. You can find it in module `simplegeofence`, the function is called `check_for_fence_breaches`.
-```
 
 ### The control variables
 
