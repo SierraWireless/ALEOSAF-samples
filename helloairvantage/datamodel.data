@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ASCII"?>
+<data:AssetContainer xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:data="http://www.sierrawireless.com/airvantage/data/1.0">
+  <assets defaultLabel="HelloAirVantage" id="HelloAirVantage">
+    <variable description="Total Message Count in this session" defaultLabel="MessageCount" path="uplink.MessageCount" type="int"/>
+    <variable description="A Random Floating Point number to show data capabilities" defaultLabel="FloatingPoint" path="uplink.FloatingPoint" type="double"/>
+    <variable description="Sample String" defaultLabel="String" path="uplink.String" type="string"/>
+    <variable description="Sample state" defaultLabel="State" path="uplink.State" type="int"/>
+    <command description="Print a Message" defaultLabel="Print Message" id="" path="PrintMessage">
+      <parameter defaultLabel="Message" defaultValue="string" id="Message"/>
+    </command>
+    <setting description="Integer to display on the device console" defaultLabel="Integer" path="downlink.Integer" defaultValue="0" type="int"/>
+  </assets>
+</data:AssetContainer>
