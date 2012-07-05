@@ -14,6 +14,6 @@ Step to use
     * numDataBits=8
     * parity='none'
     * numStopBits=1
- 3. Run the sample on the device
- 4. Now you can type some text in the hyperterminal and see the sample performing echo and logging
- 5. Send "Ctrl+D" character to the sample to end it
+3. Run the sample on the device
+4. Now you can type some text in the hyperterminal and see the sample performing echo and logging
+5. Send "Ctrl+D" character to the sample to end it
