@@ -30,15 +30,15 @@ local reservevarpath = "system.aleos.reserve.ser0"
 -- Check if the serial port has been reserved for our use
 -- if not, reserve it and reboot to gain control
 -- **WARNING** This function can reboot the device
-local function reserveserialport (devicetree)
+local function reserveserialport (devtree)
 
 	-- Get the actual value of the setting, the value "1" means the serial port is already reserved
-	local serial_available = assert (devicetree.get(reservevarpath))
+	local serial_available = assert (devtree.get(reservevarpath))
 	if serial_available ~= 1 then
 		log (logname,"WARNING","Serial port not available, reserving it now...")
 
 		-- Set the setting to "1" and reboot
-		local result = assert (devicetree.set(reservevarpath, 1))
+		local result = assert (devtree.set(reservevarpath, 1))
 		log (logname,"WARNING", "Rebooting now...")
 		system.reboot("Reserving serial port for AAF.")
 
@@ -50,6 +50,8 @@ end
 
 --------------------------------------------------------------------------------
 -- Serial Sample - Examples of the serial port API usage
+--
+-- @function [parent=#global] main
 --
 function main ()
 
@@ -67,8 +69,7 @@ function main ()
 	-- Openning serial port with default settings
 	log(logname,"INFO","Opening serial port...")
 	local portname = "/dev/ttyS0"
-	local serial_config =
-	{
+	local serial_config = {
 		baudRate=115200,
 		flowControl = 'none',
 		numDataBits=8,
