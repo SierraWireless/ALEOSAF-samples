@@ -3,11 +3,11 @@ ALEOSAF-samples
 
 Code samples and tutorials available for ALEOS Application Framework:
 
-* [Device Parameter Access](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/deviceparamaccess)
-* [Hello Air Vantage](https://github.com/SierraWireless/ALEOSAF-samples/tree/master/helloairvantage)
-* [Serial](https://github.com/SierraWireless/ALEOSAF-samples/tree/master/serial)
+* [Device Parameter Access](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/sampledeviceparamaccess)
+* [Hello Air Vantage](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/samplehelloairvantage)
+* [Serial](https://github.com/SierraWireless/ALEOSAF-samples/tree/master/sampleserial)
 * [Simple Geo-Fence Tutorial](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/simplegeofence)
-* [SMS](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/sms)
+* [SMS](http://github.com/SierraWireless/ALEOSAF-samples/tree/master/samplesms)
 
 Running the samples
 -------------------
