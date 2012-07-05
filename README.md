@@ -12,11 +12,11 @@ Code samples and tutorials available for ALEOS Application Framework:
 Running the samples
 -------------------
 
-You are free to set up your environment manually, but recommend the use of ALEOS AF Developer Studio for a smoother experience.
+We recommend the use of ALEOS AF Developer Studio for a smoother experience.
 
 ### ALEOS AF Developer Studio
 
-[Download ALEOS AF Developer Studio](http://developer.sierrawireless.com/en/Resources/Resources/Tools/ALEOS_AF_Studio.aspx), and read its [tutorial](http://developer.sierrawireless.com/en/Resources/Resources/Educational_Documentation/Tutorial_AAF_Getting_Started.aspx) to master its features.
+[Download ALEOS AF Developer Studio](http://developer.sierrawireless.com/en/Resources/Resources/Tools/ALEOS_AF_Studio.aspx), it is *strongly recommended* to read its [getting started](http://developer.sierrawireless.com/en/Resources/Resources/Educational_Documentation/Tutorial_AAF_Getting_Started.aspx) to master its features and concepts.
 
 ### Add Git support to ALEOS AF Developer Studio
 
