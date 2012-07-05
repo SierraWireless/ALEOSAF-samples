@@ -1,3 +1,14 @@
+-------------------------------------------------------------------------------
+-- Copyright (c) 2012 Sierra Wireless and others.
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--     Sierra Wireless - initial API and implementation
+-------------------------------------------------------------------------------
+
 --
 -- Hello app communication with Air Vantage Platform
 --
@@ -23,13 +34,15 @@ end
 -- The callback function that receives the commands
 -- and prints the variable path and the table value
 -- Need to return "ok" at the end
-local function printcallback (assetInstance, commandArgumentsList, pathcommandsprintmessage)
+local function printcallback (assetInstance, commandArgumentslist, pathcommandsprintmessage)
 	log(logname, "INFO", "printcallback: path_commands_PrintMessage: %s, commandArgumentsList[1]: %s.",
-	pathcommandsprintmessage, commandArgumentsList[1])
+	pathcommandsprintmessage, commandArgumentslist[1])
 	return "ok"
 end
 
-
+---
+-- @function [parent=#global] main
+--
 local function main ()
 
 	-- Configure log level
