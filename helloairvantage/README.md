@@ -28,7 +28,7 @@ Data send every 30s
 How to run
 ==========
 
-** This part assume you are familiar with the concepts explain in the getting started document.**
+**This part assume you are familiar with the concepts explain in the getting started document.**
 
 1. Import the project in the Developer Studio for ALEOS
     1. In the Import dialog select *"Existing Project into Workspace"* kind of import
