@@ -1,10 +1,21 @@
+-------------------------------------------------------------------------------
+-- Copyright (c) 2012 Sierra Wireless and others.
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--     Sierra Wireless - initial API and implementation
+-------------------------------------------------------------------------------
+
 --
 -- ALEOS AF Device Parameter Access sample.
 --
-local deviceparamaccess = require 'deviceparamaccess'
 local devicetree        = require 'devicetree'
 local sched             = require 'sched'
 local os                = require 'os'
+local log 				= require 'log'
 
 --------------------------------------------------------------------------------
 -- Variable paths to be used
@@ -17,126 +28,129 @@ local PWR_IN      = 'system.io.powerin'
 local DIN1        = 'system.aleos.io.in1'
 local NET_STATE   = 'system.aleos.cellular.state'
 local RSSI        = 'system.cellular.link.rssi'
+local CELLULAR_SERVICE = 'system.cellular.link.service'
+local CELLULAR_NODE = 'system.cellular.link' 
+local APN = 'system.cellular.apn.apn'
+
+local logname     = 'PARAM_ACCESS'
 
 --------------------------------------------------------------------------------
 -- Callback function for the digital input
 -- Need to toggle the digital input to see change notifications
 --
-local function when_dig_input_changes (din_data)
-	print ("Digital input 1 = ", din_data[DIN1])
+local function rssicallback (values)
+	log (logname, "INFO" ,"RSSI value change to: %s", values[RSSI])
 end
 
 --------------------------------------------------------------------------------
 -- Callback function for the GPS variables
 --
-local function when_gps_changes (gps_data)
+local function rssiorservicecallback (values)
 	-- Display every variable name and value passed by Aleos to the callback
-	for name, value in pairs(gps_data) do
-		print (name, value)
+	log (logname, "INFO", "One or both of RSSI and Cellular service variables change")
+	for name, value in pairs(values) do
+		log (logname, "INFO", "Celluar variable named %s value is %s",name, value)
 	end
-	print ()
 end
+
+
+--------------------------------------------------------------------------------
+-- Callback function for the GPS variables
+--
+local function celluarcallback (values)
+	-- Display every variable name and value passed by Aleos to the callback
+	log (logname, "INFO", "One or several celluar variables change")
+	for name, value in pairs(values) do
+		log (logname, "INFO", "Celluar variable named %s value is %s",name, value)
+	end
+end
+
+--------------------------------------------------------------------------------
+-- Callback function for the GPS variables
+--
+local function celluarwithpassivecallback (values)
+	-- Display every variable name and value passed by Aleos to the callback
+	log (logname, "INFO", "One or several celluar variables change passive")
+	for name, value in pairs(values) do
+		log (logname, "INFO", "Celluar variable named %s value is %s",name, value)
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Initialize the devicetree module, run all examples, cleanup and exit.
 -- @function [parent=#global] main
 --
 function main ()
+	log.setlevel("INFO")
+	log(logname, "INFO", "Application starting...")
 
+	-- Intialize device tree before using it
 	assert (devicetree.init())
-	sched.wait(1)
 
 	--
-	-- One time access of static variables
+	-- Log some variables
+	local dname  = assert(devicetree.get (DEVICE_NAME))
+	log(logname, "INFO", "Device name: %s", dname)
+
+	local swver = assert(devicetree.get (SW_VER))
+	log(logname, "INFO", "Software version: %s", swver)
+
+	local powerin = assert(devicetree.get (PWR_IN))
+	log(logname, "INFO", "Power in: %sV", powerin)
+
 	--
-	local dname  = devicetree.get (DEVICE_NAME)
-	local sw_ver = devicetree.get (SW_VER)
-	local powerin = devicetree.get (PWR_IN)
-
-	print ("DEVICE name =", dname)
-	print ("Software version =", sw_ver)
-	print ("powerin = ", powerin, " volts")
-	sched.wait(1)
-
-	--
-	-- Change a variable's value, check that the change took effect.
-	--
-	local dname  = devicetree.get (DEVICE_NAME)
-	print ("Device name =", dname)
-
-	print ("Set a variable - append 'Z' to device name")
-	assert (devicetree.set(DEVICE_NAME, dname .. 'Z'))
-	local new_name = devicetree.get(DEVICE_NAME)
-	print ("New Device Name =  ", new_name)
-	sched.wait(2)
-
-	print ('Set name back to the original...')
-	assert (devicetree.set(DEVICE_NAME, dname))
-	dname  = devicetree.get (DEVICE_NAME)
-	print ("Device name =", dname)
-	sched.wait(1)
+	-- Change a variable's value
+	-- Append 'Z' to the APN
+	-- WARNING, this code change your APN and may broke your over the air data connection
+	local var = devicetree.get('system.aleos.lan')
+	local hostname = assert (devicetree.get(APN))
+	hostname = hostname .. 'Z'
+	assert (devicetree.set(APN, hostname))
+	log(logname, "INFO", "Setting APN setting to: %s", hostname)
 
 	--
 	-- Be notified, through a callback, every time a given variable changes.
 	-- This is done through method:
-	--    devicetree.register (list_of_variables, callback, passive_vars)
+	--    devicetree.register
 	--
-	local din_id = assert (devicetree.register(DIN1, when_dig_input_changes))
-	devicetree.unregister (din_id)
-	-- gps subscription already cancelled.
-	sched.wait(1)
+	log(logname, "INFO", "Start listening to RSSI variable")
+	local rssiid = assert (devicetree.register(RSSI, rssicallback))
+	-- Wait 30s and stop listening
+	sched.wait(30)
+	log(logname, "INFO", "Stop listening to RSSI variable")
+	devicetree.unregister (rssiid)
 
 	--
-	-- Monitor GPS latitude, longitude, and satellite count.
-	--
-	-- Every time one of the variables change, the `"when_gps_changes"` callback is
-	-- called with all the variables of the set that changed.
-	--
-
-	-- Subscribe to a set of variables
-	print ("Registering GPS variables\n")
-	local gps_variables = { LAT, LON, SAT_CNT }
-	local gps_id = assert (devicetree.register(gps_variables, when_gps_changes))
-
-	-- Pause to see notifications
-	sched.wait(5)
-
-	-- Unsubscribe from notifications
-	print ("unregistering GPS vars...")
-	devicetree.unregister (gps_id)
-	sched.wait(5) -- Notifications should stop
+	-- Listen to several variables
+	-- Every time one or both of the variables change, the associated callback is called
+	log(logname, "INFO", "Start listening to both RSSI and Cellular Service variables")
+	local celluarvariables = { RSSI, CELLULAR_SERVICE }
+	local celularid = assert (devicetree.register(celluarvariables, rssiorservicecallback))
+	-- Wait 30s and stop listening
+	sched.wait(30)
+	log(logname, "INFO", "Stop listening to RSSI and Cellular Service variables")
+	devicetree.unregister (celularid)
 
 	--
 	-- Monitor GPS variables plus "passive" variables.
 	--
-	-- When one of the GPS variables change, the `"when_gps_changes"` callback is
+	-- When one of the celluar variables change, the callback is
 	-- called with each of the variables of the set that changed.
-	-- Moreover, whenever any GPS variable change triggers the callback,
+	-- Moreover, for each call of the callback,
 	-- the `"passive"` variables are also included.
 	-- Since net variables are passed as `"passive"` here,
 	-- a change in the net variables won't trigger the callback.
-	--
-	print ("Registering GPS variables and passive vars\n")
-	local gps_variables = { LAT, LON, SAT_CNT }
-	local net_variables = { NET_STATE, RSSI }
-	local gps_id = assert (devicetree.register(gps_variables, when_gps_changes, net_variables))
+	log(logname, "INFO", "Start listening to RSSI and Cellular services with passive variables")
+	local active_variables = { RSSI, CELLULAR_SERVICE }
+	local passive_variables = { DEVICE_NAME, PWR_IN }
+	assert (devicetree.register(active_variables, celluarwithpassivecallback, passive_variables))
 
-	-- Pause to see notifications
-	sched.wait(5)
-
-	-- Unsubscribe from notifications
-	print ("unregistering GPS vars...")
-	devicetree.unregister (gps_id)
-	sched.wait(5) -- Notifications should stop
-
-	print ("End of sample, cleaning up")
-
-	sched.wait(2)
-
-	print ("Exiting")
-	os.exit(0) -- status code 0 = normal termination
+	-- Don't stop to listen, the remainng registed callbacks are still notified as the sample is running, see sched.loop()
+	log(logname, "INFO", "Sample terminated, the last listening callback is still active")
 end
 
 -------------------------------------------------------------------------------
--- Schedule the main function, and launch the scheduler main loop
+-- Schedule the main function
 sched.run(main)
+-- Launch the main loop, to continue to receive registred notification
 sched.loop()
