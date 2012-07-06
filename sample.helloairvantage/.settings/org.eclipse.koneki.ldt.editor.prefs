@@ -1,0 +1,8 @@
+#Fri Jul 06 10:31:28 CEST 2012
+eclipse.preferences.version=1
+formatter.indentation.indentTables=true
+formatter.indentation.size=4
+formatter.profiles.active=org.eclipse.dltk.lua.formatter.profiles.default
+formatter.tabulation.char=tab
+formatter.tabulation.size=4
+formatterId=org.eclipse.koneki.ldt.editor.LuaFormatterFactory
