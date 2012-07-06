@@ -11,5 +11,6 @@
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/sample.sms" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/sample.deviceparamaccess" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/sample.helloairvantage" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/sample.socket" type="4"/>
 </workingSets>
 </psf>
