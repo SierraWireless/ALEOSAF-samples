@@ -20,7 +20,6 @@ local log           = require "log"
 
 local logname       = "HELLO_AV"
 
-
 -------------------------------------------------------------------------------
 -- The callback function that receives the variable updates
 -- and logs the variable path and  value
@@ -62,11 +61,11 @@ local function main ()
 	-- Log device serial number for debug purpose
 	log(logname, "INFO", "config.agent.deviceId: %s", tostring(device.get ("config.agent.deviceId")))
 
-	-- Register Callback Functions Against Command Branch
+	-- Register callback function against the asset tree
 	-- Note the path and name of the command in the tree
 	helloasset.tree.commands.PrintMessage = printcallback
 
-	-- Register Data Elements Against Branches/Path
+	-- Register data elements against the asset tree
 	-- Note the path and name of the setting in the tree
 	helloasset.tree.downlink = {}
 	helloasset.tree.downlink.Integer = integercallback
@@ -86,7 +85,7 @@ local function main ()
 	-- Put a state into the queue
 	helloasset:pushdata("uplink", {State=1}, "now")
 
-	-- Repeat forever
+	-- Send some data every 30s forever
 	log(logname, "INFO", "Starting Loop")
 	while true do
 		-- Set the variable values that we want to send
