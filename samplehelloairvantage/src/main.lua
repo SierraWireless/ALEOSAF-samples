@@ -12,20 +12,20 @@
 --
 -- Hello app communication with Air Vantage Platform
 --
-local airvantage	= require "airvantage"  -- Library to access AirVantage
-local device		= require "devicetree"
+local airvantage    = require "airvantage"  -- Library to access AirVantage
+local devicetree    = require "devicetree"
 local sched         = require "sched"
 local math          = require "math"
 local log           = require "log"
 
-local logname       = "HELLO_AV"
+local LOG_NAME       = "HELLO_AV"
 
 -------------------------------------------------------------------------------
 -- The callback function that receives the variable updates
 -- and logs the variable path and  value
 -- Need to return "ok" at the end
 local function integercallback (assetInstance, value, path)
-	log(logname, "INFO", "integercallback: path = %s, value = %s.", tostring(path), tostring(value))
+	log(LOG_NAME, "INFO", "integercallback: path = %s, value = %s.", tostring(path), tostring(value))
 	return "ok"
 end
 
@@ -34,8 +34,8 @@ end
 -- and prints the variable path and the table value
 -- Need to return "ok" at the end
 local function printcallback (assetInstance, commandArgumentslist, pathcommandsprintmessage)
-	log(logname, "INFO", "printcallback: path_commands_PrintMessage: %s, commandArgumentsList[1]: %s.",
-	pathcommandsprintmessage, commandArgumentslist[1])
+	log(LOG_NAME, "INFO", "Received a PrintMessage command, with message '%s'.",
+	    commandArgumentslist[1])
 	return "ok"
 end
 
@@ -44,30 +44,26 @@ end
 --
 local function main ()
 
-	-- Configure log level
-	log.setlevel("INFO")
+	log.setlevel("INFO") -- Set log verbosity
+	devicetree.init()    -- Access to device variables
+	airvantage.init()    -- Asset management module
 
-	local server, status
-	---------------------------------------------------------------------------
-	-- Initialize the link to get and set ALEOS information
-	device.init()
-
-	-- Initialize the link to the ReadyAgent
-	airvantage.init()
-
-	-- Create a new instance of an asset.
+	-- Create a new asset instance.
 	local helloasset = assert (airvantage.newAsset("HelloAirVantage"))
 
 	-- Log device serial number for debug purpose
-	log(logname, "INFO", "config.agent.deviceId: %s", tostring(device.get ("config.agent.deviceId")))
+	log(LOG_NAME, "INFO", "config.agent.deviceId: %s", tostring(device.get ("config.agent.deviceId")))
 
-	-- Register callback function against the asset tree
-	-- Note the path and name of the command in the tree
+	-- By registering this command, we ensure that `printcallback()` will be
+	-- called on the device every time a `"PrintMessage"` command is sent to
+	-- this asset by an AirVantage server.
 	helloasset.tree.commands.PrintMessage = printcallback
 
-	-- Register data elements against the asset tree
-	-- Note the path and name of the setting in the tree
-	helloasset.tree.downlink = {}
+    -- By registering this command, we ensure that `integercallback()` will be
+    -- called on the device every time an AirVantage server sends some data
+    -- to this asset with the path `"downlink.Integer"`. As the name implies,
+    -- the callback expects the data value to be an integer.
+	helloasset.tree.downlink = { }
 	helloasset.tree.downlink.Integer = integercallback
 
 	-- Start the asset to enable sending and receiving data.
@@ -82,27 +78,38 @@ local function main ()
 	math.randomseed(os.time())
 	local count = 0
 
-	-- Put a state into the queue
+	-- Upload data "State=1" to the server
 	helloasset:pushdata("uplink", {State=1}, "now")
 
-	-- Send some data every 30s forever
-	log(logname, "INFO", "Starting Loop")
-	while true do
-		-- Set the variable values that we want to send
-		count = count + 1
-		local randomnumber = math.random()
-		local stringvalue = "Hello AirVantage: "
-		log(logname, "INFO", "Sending new data: messagecount = %s, randomnumber = %s, stringvalue = %s.",tostring(count), tostring(randomnumber), stringvalue)
+    -- This loop will generate a random number every 30 seconds, and immediately
+    -- upload it to the server.
+    local function random_num_every_30s()
+        while true do
+            local num = math.random()
+            log(LOG_NAME, 'INFO', "Uploading FloatingPoint = %i", num)
+            helloasset:pushdata("uplink.FloatingPoint", num, 'now')
+        end
+    end
+    sched.run (random_num_every_30s) -- run in a parallel thread
 
-		-- Push them into hourly queue
-		helloasset:pushdata("uplink", {MessageCount=count, FloatingPoint=randomnumber, String=stringvalue}, "hourly")
-
-		-- Connect to the server and push all the data up
-		airvantage.triggerpolicy("*")
-
-		-- Sleep 30 seconds
-		sched.wait(30)
-	end
+    -- This loop will generate a string minute, and accumulate it in a staging
+    -- table; the table's content will be uploaded to the server every hour,
+    -- thous limiting the number of wireless connections.
+    --
+    -- This separation between data acquisition and reporting is achieved thanks
+    -- to pushdata's `policy` parameter, here set to `"hourly"`.
+    --
+    -- WARNING: Here the data are timestamped by the device, at acquisition time.
+    -- If the device's clock is not set correctly, the data retrieved on the
+    -- server will also have incorrect timestamps. 
+    local function string_every_minute()
+        while true do
+            local str = "String acquired at "+os.date()
+            log(LOG_NAME, 'INFO', "Accumulating a string")
+            helloasset:pushdata("uplink", { String=str, timestamp=os.time() }, 'hourly')
+        end
+    end
+    sched.run (string_every_minute) -- run in a parallel thread
 end
 
 sched.run(main)
