@@ -17,58 +17,45 @@ local os     = require "os"
 local sched  = require "sched"
 local socket = require "socket"
 
-local LOGMODULENAME = "SOCKET"
-local LOGLEVEL      = "INFO"
+local LOG_NAME = "SOCKET"
 
 local function main ()
 
-	log.setlevel(LOGLEVEL)
-	log(LOGMODULENAME, LOGLEVEL, "Starting sample...")
+    log.setlevel('INFO')
+    log(LOG_NAME, 'INFO', "Starting sample...")
 
-	-- Create and open a TCP socket and bind it to the localhost, at any port
-	local server = assert(socket.bind("*", 0))
+    -- Create and open a TCP socket and bind it to the localhost, at any port
+    local server = assert(socket.bind("*", 0))
 
-	-- Find out which port ALEOS chose for us
-	local _, port = server:getsockname()
-	log(LOGMODULENAME, LOGLEVEL, "TCP socket listening on port %s, waiting...", port)
-	log(LOGMODULENAME, LOGLEVEL, "Open a telnet connection on the device, for the %s port.", port)
+    -- Find out which port ALEOS chose for us
+    local localaddress, port = server:getsockname()
+    log(LOG_NAME, 'INFO', "TCP socket listening on port %d, please connect a telnet client to it.", port)
 
-	-- Wait for a connection from clients
-	local client = server:accept()
-	log(LOGMODULENAME, LOGLEVEL, "Incoming connection accepted.\nType 'stop' to close the sample\n")
+    -- Wait for a connection from clients
+    local client = server:accept()
+    log(LOG_NAME, 'INFO', "Incoming connection accepted.\nType 'stop' to close the sample\n")
 
-	-- Loop forever waiting for clients
-	repeat
+    server:close() -- close the server, so that no more connection will be accepted
 
-		-- One client connects, send a welcome message
-		client:send("Welcome, you have 15s to type a line here: ")
+    client:settimeout(15) -- send and receive operations will timeout after 15s
 
-		-- Wait 15s to for the line.
-		client:settimeout(15)
+    -- Loop forever waiting for clients
+    repeat
+        client:send("Welcome, you have 15s to type a line here: ") -- welcome message to client
+        local line, err = client:receive() -- read a line from client (15s timeout still applies)
+        if not err then -- Success
+            log(LOG_NAME, 'INFO', "Line correctly received: '%s'.", line)
+            client:send(string.format("Line received: '%s'.\n", line))
+        else
+            log(LOG_NAME, 'INFO', "Error when receiving message: %s", err)
+        end
 
-		-- Retreive actual line
-		local line, err = client:receive()
+    until line == "stop"
 
-		-- Send an acknowledgement message to the client
-		if not err then
-			log(LOGMODULENAME, LOGLEVEL, "Line correctly received: %s.", line)
-			client:send(string.format("Line received: %s.\n", line))
-		else
-			log(LOGMODULENAME, LOGLEVEL, "Error when receiving message: %s", err)
-		end
-
-	until line == "stop"
-
-	-- Close the current connection
-	log(LOGMODULENAME, LOGLEVEL, "Closing connection now.")
-	client:close()
-	log(LOGMODULENAME, LOGLEVEL, "Connection closed.")
-
-	log(LOGMODULENAME, LOGLEVEL, "Closing port.")
-	server:close()
-
-	log(LOGMODULENAME, LOGLEVEL, "Sample end.")
-	os.exit()
+    -- Close the current connection
+    client:close()
+    log(LOG_NAME, 'INFO', "Connection closed, sample terminated.")
+    os.exit()
 end
 
 sched.run(main)

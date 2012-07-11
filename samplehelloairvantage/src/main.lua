@@ -25,8 +25,9 @@ local LOG_NAME       = "HELLO_AV"
 -- and logs the variable path and  value
 -- Need to return "ok" at the end
 local function integercallback (assetInstance, value, path)
-	log(LOG_NAME, "INFO", "integercallback: path = %s, value = %s.", tostring(path), tostring(value))
-	return "ok"
+    log(LOG_NAME, "INFO", "integercallback: path = %s, value = %s.", 
+        tostring(path), tostring(value))
+    return "ok"
 end
 
 -------------------------------------------------------------------------------
@@ -34,9 +35,9 @@ end
 -- and prints the variable path and the table value
 -- Need to return "ok" at the end
 local function printcallback (assetInstance, commandArgumentslist, pathcommandsprintmessage)
-	log(LOG_NAME, "INFO", "Received a PrintMessage command, with message '%s'.",
-	    commandArgumentslist[1])
-	return "ok"
+    log(LOG_NAME, "INFO", "Received a PrintMessage command, with message '%s'.",
+        commandArgumentslist[1])
+    return "ok"
 end
 
 ---
@@ -44,42 +45,43 @@ end
 --
 local function main ()
 
-	log.setlevel("INFO") -- Set log verbosity
-	devicetree.init()    -- Access to device variables
-	airvantage.init()    -- Asset management module
+    log.setlevel("INFO") -- Set log verbosity
+    devicetree.init()    -- Access to device variables
+    airvantage.init()    -- Asset management module
 
-	-- Create a new asset instance.
-	local helloasset = assert (airvantage.newAsset("HelloAirVantage"))
+    -- Create a new asset instance.
+    local helloasset = assert (airvantage.newAsset("HelloAirVantage"))
 
-	-- Log device serial number for debug purpose
-	log(LOG_NAME, "INFO", "config.agent.deviceId: %s", tostring(device.get ("config.agent.deviceId")))
+    -- Log device serial number for debug purpose
+    log(LOG_NAME, "INFO", "config.agent.deviceId: %s", 
+        tostring(device.get ("config.agent.deviceId")))
 
-	-- By registering this command, we ensure that `printcallback()` will be
-	-- called on the device every time a `"PrintMessage"` command is sent to
-	-- this asset by an AirVantage server.
-	helloasset.tree.commands.PrintMessage = printcallback
+    -- By registering this command, we ensure that `printcallback()` will be
+    -- called on the device every time a `"PrintMessage"` command is sent to
+    -- this asset by an AirVantage server.
+    helloasset.tree.commands.PrintMessage = printcallback
 
     -- By registering this command, we ensure that `integercallback()` will be
     -- called on the device every time an AirVantage server sends some data
     -- to this asset with the path `"downlink.Integer"`. As the name implies,
     -- the callback expects the data value to be an integer.
-	helloasset.tree.downlink = { }
-	helloasset.tree.downlink.Integer = integercallback
+    helloasset.tree.downlink = { }
+    helloasset.tree.downlink.Integer = integercallback
 
-	-- Start the asset to enable sending and receiving data.
-	assert (helloasset:start(), "Can't register Agent")
-	sched.wait(10)
+    -- Start the asset to enable sending and receiving data.
+    assert (helloasset:start(), "Can't register Agent")
+    sched.wait(10)
 
-	-- We're all set up now to send and receive data.
-	-- Time to do some work!
-	---------------------------------------------------------------------------
+    -- We're all set up now to send and receive data.
+    -- Time to do some work!
+    ---------------------------------------------------------------------------
 
-	-- Initialize random number generator and message count
-	math.randomseed(os.time())
-	local count = 0
+    -- Initialize random number generator and message count
+    math.randomseed(os.time())
+    local count = 0
 
-	-- Upload data "State=1" to the server
-	helloasset:pushdata("uplink", {State=1}, "now")
+    -- Upload data "State=1" to the server
+    helloasset:pushdata("uplink", {State=1}, "now")
 
     -- This loop will generate a random number every 30 seconds, and immediately
     -- upload it to the server.

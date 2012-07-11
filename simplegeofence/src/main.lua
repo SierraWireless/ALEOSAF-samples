@@ -130,7 +130,7 @@ state = {
 --   `:getvariable()`.
 -- @return `"OK"` to indicate successful handling of the callback.
 function check_for_fence_breaches(gps_data)
-    
+
     log(LOG_NAME, 'DEBUG', "Checking for fence breaches %s", sprint(gps_data))
 
     -- Bail out if disabled
@@ -159,16 +159,16 @@ function check_for_fence_breaches(gps_data)
     local l_pos = state.last_reported_position
     local has_moved = not l_pos or l_pos :distance(p) > asset.tree.control.epsilon
     local must_track = asset.tree.control.tracked or
-        (not is_in_fence and asset.tree.control.trackifescaped)
+    (not is_in_fence and asset.tree.control.trackifescaped)
     if has_moved and must_track then
         log(LOG_NAME, 'INFO', "Asset tracked: reporting position")
         asset :pushdata ("position", p, "now")
         state.last_reported_position = p
     end
-    
+
     -- Update the application's state for next iteration
     state.was_in_fence  = is_in_fence
-    
+
     return 'ok'
 end
 
@@ -197,7 +197,7 @@ function handle_command_setfence (asset, args, path, ticket_id)
     -- out of fence, or an escaped asset might find itself back in fence. 
     -- Check whether we're in breach of fence.
     check_for_fence_breaches(devicetree.get(GPS_DATA))
-    
+
     return 'ok'
 end
 
@@ -233,7 +233,7 @@ function main()
     -- we ensure that both latitude & longitude values are always passed to 
     -- the callback.
     devicetree.register(GPS_VARS, check_for_fence_breaches, GPS_VARS)
-    
+
     log(LOG_NAME, 'INFO', "Application started: waiting for GPS movements and Portal commands.")
 
 end

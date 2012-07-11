@@ -20,29 +20,25 @@ local sms   = require 'sms'
 --
 -- Setting telephone numbers
 --
-local SMSRECIPIENTNUMBER = '9995551234'
-local SMSSENDERNUMBER    = '9995551234'
+local SMS_RECIPIENT_NUMBER = '9995551234'
+local SMS_SENDER_NUMBER    = '9995551234'
 
 --
 -- SMS send settings
 --
-local MESSAGEFORMAT      = '7bits'
-local MESSAGEPATTERN     = '.*you.*'
-local TIMETOWAITFORREPLY = 40
+local MESSAGE_FORMAT      = '7bits'
+local MESSAGE_PATTERN     = '.*you.*'
+local TIME_TO_WAIT_FOR_REPLY = 40
 
---
--- Set up logging settings
---
-local LOGMODULEAME = 'SMSSAMPLE'
-local LOGSEVERITY  = 'INFO'
+local LOG_NAME = 'SMSSAMPLE'
 
 --------------------------------------------------------------------------------
 -- Callback function for SMS messages received
 local function whensmsisreceived(sender, message)
-	log(LOGMODULEAME, LOGSEVERITY, 'Call back received from %s:%s', sender, message)
-	local messagetosend = string.format('Hey, I just received this message: %s.', message)
-	assert (sms.send(SMSRECIPIENTNUMBER, messagetosend, MESSAGEFORMAT))
-	log(LOGMODULEAME, LOGSEVERITY, 'Call back anwsered to last message from %s.', sender)
+    log(LOG_NAME, 'INFO', 'Call back received from %s:%s', sender, message)
+    local messagetosend = string.format('Hey, I just received this message: %s.', message)
+    assert (sms.send(SMS_RECIPIENT_NUMBER, messagetosend, MESSAGE_FORMAT))
+    log(LOG_NAME, 'INFO', 'Call back anwsered to last message from %s.', sender)
 end
 
 -------------------------------------------------------------------------------
@@ -59,70 +55,71 @@ end
 --
 local function main ()
 
-	-- Initiate logging
-	log.setlevel(LOGSEVERITY)
+    -- Initiate logging
+    log.setlevel('INFO')
 
-	log(LOGMODULEAME, LOGSEVERITY, 'Starting SMS sample app')
-	assert(sms.init())
+    log(LOG_NAME, 'INFO', 'Starting SMS sample app')
+    assert(sms.init())
 
-	--
-	-- Register to receive all SMS messages from any number, with any message
-	-- content.
-	--
-	log(LOGMODULEAME, LOGSEVERITY, 'Register to receive all SMS messages')
-	local smsregistrationid = assert (sms.register(whensmsisreceived))
+    --
+    -- Register to receive all SMS messages from any number, with any message
+    -- content.
+    --
+    log(LOG_NAME, 'INFO', 'Register to receive all SMS messages')
+    local smsregistrationid = assert (sms.register(whensmsisreceived))
 
-	-- Send a SMS message
-	log(LOGMODULEAME, LOGSEVERITY, 'Sending SMS message to %s, waiting for any SMS.', SMSRECIPIENTNUMBER)
-	assert (sms.send(SMSRECIPIENTNUMBER, 'Hi, I am your lua app. You can send me messages.', MESSAGEFORMAT))
+    -- Send a SMS message
+    log(LOG_NAME, 'INFO', 'Sending SMS message to %s, waiting for any SMS.', SMS_RECIPIENT_NUMBER)
+    assert (sms.send(SMS_RECIPIENT_NUMBER, 'Hi, I am your lua app. You can send me messages.', MESSAGE_FORMAT))
 
-	-- Pause to receive messages
-	sched.wait(TIMETOWAITFORREPLY)
+    -- Pause to receive messages
+    sched.wait(TIME_TO_WAIT_FOR_REPLY)
 
-	-- Unregister from receiving all msgs
-	sms.unregister(smsregistrationid)
+    -- Unregister from receiving all msgs
+    sms.unregister(smsregistrationid)
 
-	--
-	-- Register to receive SMS messages from a specific phone number
-	--
-	log(LOGMODULEAME, LOGSEVERITY, 'Register to receive messages only from %s.', SMSRECIPIENTNUMBER)
+    --
+    -- Register to receive SMS messages from a specific phone number
+    --
+    log(LOG_NAME, 'INFO', 'Register to receive messages only from %s.', SMS_RECIPIENT_NUMBER)
 
-	-- Note the country code may not be in the received message
-	smsregistrationid = assert (sms.register(whensmsisreceived, SMSRECIPIENTNUMBER))
+    -- Note the country code may not be in the received message
+    smsregistrationid = assert (sms.register(whensmsisreceived, SMS_RECIPIENT_NUMBER))
 
-	-- Send a SMS message
-	log(LOGMODULEAME, LOGSEVERITY, 'Sending SMS message to %s.', SMSRECIPIENTNUMBER)
-	assert (sms.send(SMSRECIPIENTNUMBER, 'Now, I only handle SMS from you.', MESSAGEFORMAT))
+    -- Send a SMS message
+    log(LOG_NAME, 'INFO', 'Sending SMS message to %s.', SMS_RECIPIENT_NUMBER)
+    assert (sms.send(SMS_RECIPIENT_NUMBER, 'Now, I only handle SMS from you.', MESSAGE_FORMAT))
 
-	-- Pause to receive messages
-	sched.wait(TIMETOWAITFORREPLY)
+    -- Pause to receive messages
+    sched.wait(TIME_TO_WAIT_FOR_REPLY)
 
-	-- Unregister from receiving sms msgs
-	sms.unregister (smsregistrationid)
+    -- Unregister from receiving sms msgs
+    sms.unregister (smsregistrationid)
 
-	--
-	-- Register to receive SMS messages that have specific content in msg body
-	--
-	log(LOGMODULEAME, LOGSEVERITY, 'Register to receive messages containing a pattern in msg body.')
-	smsregistrationid = assert (sms.register(whensmsisreceived, nil, MESSAGEPATTERN))
+    --
+    -- Register to receive SMS messages that have specific content in msg body
+    --
+    log(LOG_NAME, 'INFO', 'Register to receive messages containing a pattern in msg body.')
+    smsregistrationid = assert (sms.register(whensmsisreceived, nil, MESSAGE_PATTERN))
 
-	-- Send a SMS message
-	log(LOGMODULEAME, LOGSEVERITY, 'Sending SMS message to %s.', SMSRECIPIENTNUMBER)
-	local messagetosend = string.format("If you send me a SMS matching '%s' Lua pattern, I will answer.", MESSAGEPATTERN)
-	assert (sms.send(SMSRECIPIENTNUMBER, messagetosend, MESSAGEFORMAT))
+    -- Send a SMS message
+    log(LOG_NAME, 'INFO', 'Sending SMS message to %s.', SMS_RECIPIENT_NUMBER)
+    local msg = string.format("If you send me a SMS matching pattern %q I will answer.",
+        MESSAGE_PATTERN)
+    assert (sms.send(SMS_RECIPIENT_NUMBER, msg, MESSAGE_FORMAT))
 
-	-- Pause to receive messages
-	sched.wait(TIMETOWAITFORREPLY)
+    -- Pause to receive messages
+    sched.wait(TIME_TO_WAIT_FOR_REPLY)
 
-	-- Unregister from receiving sms msgs
-	sms.unregister (smsregistrationid)
+    -- Unregister from receiving sms msgs
+    sms.unregister (smsregistrationid)
 
-	--
-	-- Exiting nicely, with status code 0 for normal termination
-	--
-	log(LOGMODULEAME, LOGSEVERITY, 'End of SMS sample.')
-	log(LOGMODULEAME, LOGSEVERITY, 'Exiting')
-	os.exit(0)
+    --
+    -- Exiting nicely, with status code 0 for normal termination
+    --
+    log(LOG_NAME, 'INFO', 'End of SMS sample.')
+    log(LOG_NAME, 'INFO', 'Exiting')
+    os.exit(0)
 end
 
 --------------------------------------------------------------------------------
