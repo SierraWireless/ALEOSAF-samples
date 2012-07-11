@@ -12,16 +12,17 @@
 --
 -- Socket sample
 --
-local sched  = require 'sched'
-local log    = require 'log'
-local socket = require 'socket'
+local log    = require "log"
+local os     = require "os"
+local sched  = require "sched"
+local socket = require "socket"
 
 local LOGMODULENAME = "SOCKET"
 local LOGLEVEL      = "INFO"
 
 local function main ()
-	log.setlevel(LOGLEVEL)
 
+	log.setlevel(LOGLEVEL)
 	log(LOGMODULENAME, LOGLEVEL, "Starting sample...")
 
 	-- Create and open a TCP socket and bind it to the localhost, at any port
@@ -32,40 +33,41 @@ local function main ()
 	log(LOGMODULENAME, LOGLEVEL, "TCP socket listening on port %s, waiting...", port)
 	log(LOGMODULENAME, LOGLEVEL, "Open a telnet connection on the device, for the %s port.", port)
 
+	-- Wait for a connection from clients
+	local client = server:accept()
+	log(LOGMODULENAME, LOGLEVEL, "Incoming connection accepted.\nType 'stop' to close the sample\n")
+
 	-- Loop forever waiting for clients
 	repeat
 
-		-- Wait for a connection from clients
-		local client = server:accept()
-		log(LOGMODULENAME, LOGLEVEL, "Incoming connection accepted.")
+		-- One client connects, send a welcome message
+		client:send("Welcome, you have 15s to type a line here: ")
 
-		-- On client connect, set a welcome message
-		client:send("Welcome, you have 15s to type a line here: (Type 'stop' to close the sample)\n")
-
-		-- wait 15s to for the line.
+		-- Wait 15s to for the line.
 		client:settimeout(15)
 
-		-- retreive the line
+		-- Retreive actual line
 		local line, err = client:receive()
 
+		-- Send an acknowledgement message to the client
 		if not err then
-			-- Send a ack message to the client
-			log(LOGMODULENAME, LOGLEVEL, "Line correctly received: %s", line)
-			client:send("Line received: "..line .. "\nClosing connection now.\n")
+			log(LOGMODULENAME, LOGLEVEL, "Line correctly received: %s.", line)
+			client:send(string.format("Line received: %s.\n", line))
 		else
 			log(LOGMODULENAME, LOGLEVEL, "Error when receiving message: %s", err)
 		end
 
-		-- Close the current connection
-		client:close()
-		log(LOGMODULENAME, LOGLEVEL, "Connection closed")
-
 	until line == "stop"
 
-	log(LOGMODULENAME, LOGLEVEL, "Closing port")
+	-- Close the current connection
+	log(LOGMODULENAME, LOGLEVEL, "Closing connection now.")
+	client:close()
+	log(LOGMODULENAME, LOGLEVEL, "Connection closed.")
+
+	log(LOGMODULENAME, LOGLEVEL, "Closing port.")
 	server:close()
 
-	log(LOGMODULENAME, LOGLEVEL, "Sample end")
+	log(LOGMODULENAME, LOGLEVEL, "Sample end.")
 	os.exit()
 end
 
