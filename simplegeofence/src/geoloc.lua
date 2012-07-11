@@ -3,7 +3,7 @@
 -- It defines point objects, geodesic surfaces, and common
 -- methods operating on these.
 -- @module geoloc
-
+--
 local M = { }
 geoloc = M
 
@@ -14,6 +14,7 @@ geoloc = M
 -- @field longitude
 -- @field altitude
 -- @field timestamp
+--
 local point = { __type='point' }
 point.__index = point
 
@@ -26,6 +27,7 @@ point.__index = point
 -- @param      alt  (optional) the altitude
 -- @param      ts   (optional) the timestamp at which the point has been collected
 -- @return #point An object point
+--
 function M.newpoint(lat, long, alt, ts)
     checks('number', 'number', '?number', '?number')
     assert(-90<=lat and lat<=90)
@@ -44,6 +46,7 @@ end
 -- @function [parent=#point] __tostring
 -- @param self
 -- @return #string
+--
 function point :__tostring()
     return  self.latitude..';'..self.longitude--string.format("%d;%d", self.latitude, self.longitude)
 end
@@ -60,6 +63,7 @@ local pi_180_earth_radius = math.pi/180 * 6.371e6
 -- @param #point p1 first point
 -- @param #point p2 second point
 -- @return #number Distance between p1 and p2, in meters.
+--
 function M.distance(p1, p2)
     checks('point', 'point')
     local x1, x2 = p1.longitude, p2.longitude
@@ -82,6 +86,7 @@ end
 -- @param #point p2 second timestamped point
 -- @return distance between p1 and p2, in km/h
 -- @return nil, error_message.
+--
 function M.speed(p1, p2)
     local t1, t2 = p1.timestamp, p2.timestamp
     if not (t1 and t2) then
@@ -98,6 +103,7 @@ end
 -- @param #point
 -- @return #number
 -- @usage apoint:distance(anotherpoint)
+--
 point.distance = M.distance
 
 
@@ -107,8 +113,8 @@ point.distance = M.distance
 -- @function [parent=#point] speed
 -- @return #number
 -- @usage apoint:speed(anotherpoint)
+--
 point.speed = M.speed
-
 
 -------------------------------------------------------------------------------
 -- @type area
@@ -116,6 +122,7 @@ point.speed = M.speed
 -- Areas are subset of the GPS coordinates space. They are
 -- characterised by their :contains(point) method, which determines
 -- whether a point is inside or outside an area.
+--
 local area = { __type='area' }
 area.__index = area
 
@@ -124,6 +131,7 @@ area.__index = area
 -- Return n>0 if p2 is on the left  of the line p0--p1
 -- Return n<0 if p2 is on the right of the line p0--p1
 -- Return 0   if p2 is on the line p0--p1
+--
 local function side(p0, p1, p2)
     return (p1.longitude-p0.longitude) * (p2.latitude-p0.latitude)
         - (p2.longitude-p0.longitude) * (p1.latitude-p0.latitude)
@@ -170,6 +178,7 @@ end
 -- ----------------------------------------------------------------------------
 -- Helpers determining whether a point is inside a shape.
 -- @type inside
+--
 local inside = { }
 
 ---
@@ -177,6 +186,7 @@ local inside = { }
 -- @param self
 -- @param #point p
 -- @return #boolean
+--
 function inside.circle(self, p)
     checks ('area', 'point')
     local d = self.center :distance (p)
@@ -191,6 +201,7 @@ end
 -- @param self
 -- @param #point p
 -- @return #boolean
+--
 function inside.rectangle(self, p)
     checks ('area', 'point')
     local corners = self.corners
@@ -204,6 +215,7 @@ end
 -- @param self
 -- @param #point p
 -- @return #boolean
+--
 function inside.poly(self, p)
     checks ('area', 'point')
     local rect, vertices = self.rectangle, self.poly
@@ -218,17 +230,20 @@ end
 ---
 -- @function [parent=#inside] everywhere
 -- @return #boolean true
+--
 function inside.everywhere() return true end
 
 ---
 -- @function [parent=#inside] nowhere
 -- @return #boolean false
+--
 function inside.nowhere() return false end
 
 ---
 -- @function [parent=#inside] inversion
 -- @param p
 -- @return #boolean true
+--
 function inside.inversion(p)
     return not self.operand :contains (p)
 end
@@ -237,6 +252,7 @@ end
 -- @function [parent=#inside] intersection
 -- @param #point p
 -- @return #boolean
+--
 function inside.intersection(p)
     for _, area in pairs(self.operands) do
         if not area :contains(p) then return false end
@@ -248,6 +264,7 @@ end
 -- @function [parent=#inside] union
 -- @param #point p
 -- @return #boolean
+--
 function inside.union(p)
     for _, area in pairs(self.operands) do
         if area :contains(p) then
@@ -264,6 +281,7 @@ end
 -- @param self
 -- @param #area rigth
 -- @return #area Their union
+--
 function area :__add(right)
     return setmetatable({kind='union', operands={self, right}}, area)
 end
@@ -275,6 +293,7 @@ end
 -- @param self
 -- @param #area rigth
 -- @return #area Their intersection
+--
 function area :__mul(right)
     return setmetatable({kind='intersection', operands={self, right}}, area)
 end
@@ -286,6 +305,7 @@ end
 -- @param self
 -- @param #area rigth
 -- @return #area Their complement
+--
 function area :__unm(right)
     return setmetatable({kind='inversion', operand=self}, area)
 end
@@ -297,6 +317,7 @@ end
 -- @param self
 -- @param #area rigth
 -- @return #area Their difference
+--
 function area :__sub(right) return self * (-right) end
 
 
@@ -306,6 +327,7 @@ function area :__sub(right) return self * (-right) end
 -- @param #point p
 -- @return #boolean true if point p is inside the shape, false if point p is
 --  outside the shape.
+--
 function area :contains (p)
     checks('area', 'point')
     local m = inside[self.kind]
@@ -315,12 +337,14 @@ end
 ---
 -- Area constructor helpers
 -- @type build
+--
 local build = { }
 
 ---
 -- @function [parent=#build] poly
 -- @param self
 -- @param #table Table of @{#point}.
+--
 function build.poly(self, points)
     local poly = parse_points_list (points)
     local rectangle = {
@@ -343,18 +367,21 @@ end
 -- @function [parent=#build] everywhere
 -- @param self
 -- @param #table Table of @{#point}.
+--
 function build.everywhere(self, points) end
 
 ---
 -- @function [parent=#build] nowhere
 -- @param self
 -- @param #table Table of @{#point}.
+--
 function build.nowhere(self, points) end
 
 ---
 -- @function [parent=#build] circle
 -- @param self
 -- @param #table Table of @{#point}.
+--
 function build.circle(self, points)
     local p = parse_points_list (points)
     local r = points :match "[0-9%.]+$" -- radius is the last number in the list
@@ -368,6 +395,7 @@ end
 -- @function [parent=#build] rectangle
 -- @param self
 -- @param #table Table of @{#point}.
+--
 function build.rectangle(self, points)
     local p = parse_points_list (points)
     if #p ~= 2 then error "Invalid rectangle corners" end
@@ -401,6 +429,7 @@ end
 --
 -- @return #area An area object
 -- @return #nil, #string error message.
+--
 function M.newarea(spec)
     checks('string')
     local kind, points = spec :lower() :match "^([a-z]*)%s*([%s%-0-9;,.]*)$"
