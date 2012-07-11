@@ -87,14 +87,9 @@ local function main ()
     -- initialize devicetree before using it
     assert(device.init())
 
-    -- add tracking vars to passive vars.
-    for _, value in ipairs(GPS_ACTIVE_VARS) do
-        table.insert(GPS_PASSIVE_VARS,value)
-    end
-
-    -- register the callback for fix, latitude and longitute values change.
-    -- the date of the fix, the sattelite count are set as passive variables
-    -- because we need to display theses values, but not to be notified of their change.
+    -- Register the callback for fix, latitude and longitute values change.
+    -- The date of the fix, the sattelite count are set as passive variables
+    -- because we need to display theses values, but not to be notified of their changes.
     -- In our case, it's very useful to avoid to be notified each second by the variable 'system.gps.seconds'
     -- The tracking variables are also set as passive variable, our callback need all theses values.
     -- If we don't add tracking variable to the passive vars, only the var that change will be pass to the callback

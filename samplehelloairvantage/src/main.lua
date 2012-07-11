@@ -54,7 +54,7 @@ local function main ()
 
     -- Log device serial number for debug purpose
     log(LOG_NAME, "INFO", "config.agent.deviceId: %s", 
-        tostring(device.get ("config.agent.deviceId")))
+        tostring(devicetree.get ("config.agent.deviceId")))
 
     -- By registering this command, we ensure that `printcallback()` will be
     -- called on the device every time a `"PrintMessage"` command is sent to

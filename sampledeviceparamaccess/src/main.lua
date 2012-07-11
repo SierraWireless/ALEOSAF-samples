@@ -12,24 +12,24 @@
 --
 -- ALEOS AF Device Parameter Access sample.
 --
-local devicetree        = require 'devicetree'
-local sched             = require 'sched'
-local os                = require 'os'
-local log 				= require 'log'
+local devicetree = require 'devicetree'
+local log        = require 'log'
+local os         = require 'os'
+local sched      = require 'sched'
 
 --------------------------------------------------------------------------------
 -- Variable paths to be used
-local SW_VER      = 'system.sw_info.fw_ver'
-local DEVICE_NAME = 'system.ddns.service.device_name'
-local PWR_IN      = 'system.io.powerin'
-local DIN1        = 'system.aleos.io.in1'
-local NET_STATE   = 'system.aleos.cellular.state'
-local RSSI        = 'system.cellular.link.rssi'
+local APN              = 'system.cellular.apn.apn'
+local CELLULAR_NODE    = 'system.cellular.link'
 local CELLULAR_SERVICE = 'system.cellular.link.service'
-local CELLULAR_NODE = 'system.cellular.link' 
-local APN = 'system.cellular.apn.apn'
+local DEVICE_NAME      = 'system.ddns.service.device_name'
+local DIN1             = 'system.aleos.io.in1'
+local NET_STATE        = 'system.aleos.cellular.state'
+local PWR_IN           = 'system.io.powerin'
+local RSSI             = 'system.cellular.link.rssi'
+local SW_VER           = 'system.sw_info.fw_ver'
 
-local LOG_NAME     = 'PARAM_ACCESS'
+local LOG_NAME = 'PARAM_ACCESS'
 
 --------------------------------------------------------------------------------
 -- Callback function which prints every name/value pair passed to it.
@@ -95,11 +95,11 @@ function main ()
     --
     log(LOG_NAME, "INFO", "Start listening to both RSSI and Cellular Service variables")
     local cellularvariables = { RSSI, CELLULAR_SERVICE }
-    local celularid = assert (devicetree.register(cellularvariables, print_callback))
+    local cellularid = assert (devicetree.register(cellularvariables, print_callback))
     -- Wait 30s and stop listening
     sched.wait(30)
     log(LOG_NAME, "INFO", "Stop listening to RSSI and Cellular Service variables")
-    devicetree.unregister (celularid)
+    devicetree.unregister (cellularid)
 
     --
     -- Monitor boath active and passive variables.
@@ -107,7 +107,7 @@ function main ()
     -- The callback is only triggered when one of the active variables changes.
     -- However, whenever triggered, the callback function receives all of the
     -- active variables which actually changed, plus every passive variable,
-    -- whether its value changed or not. Notice that a variable can be listed 
+    -- whether its value changed or not. Notice that a variable can be listed
     -- as both active and passive, so that it triggers the callback when it
     -- changes, and it's passed to the
     -- callback even if it hadn't changed.
