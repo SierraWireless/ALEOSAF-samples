@@ -44,8 +44,9 @@ end
 -- @function [parent=#global] main
 --
 local function main ()
-
     log.setlevel("INFO") -- Set log verbosity
+    log(LOG_NAME, "INFO", "Starting HelloAirVantage sample")
+
     devicetree.init()    -- Access to device variables
     airvantage.init()    -- Asset management module
 
@@ -81,19 +82,24 @@ local function main ()
     local count = 0
 
     -- Upload data "State=1" to the server
-    helloasset:pushdata("uplink", {State=1}, "now")
+    log(LOG_NAME, "INFO", "Send State variable to the Cloud Platform")
+    helloasset:pushdata("uplink.State", 1, "now")
 
     -- This loop will generate a random number every 30 seconds, and immediately
     -- upload it to the server.
-    local function random_num_every_30s()
+    local function randomloop()
         while true do
             local num = math.random()
-            log(LOG_NAME, 'INFO', "Uploading FloatingPoint = %i", num)
-            helloasset:pushdata("uplink.FloatingPoint", num, 'now')
+            count = count + 1
+            
+            log(LOG_NAME, 'INFO', "Uploading FloatingPoint = %s and MessageCount = %s", num, count)
+            helloasset:pushdata("uplink", {FloatingPoint=num, MessageCount=count}, 'now')
+            
             sched.wait(30)
         end
     end
-    sched.run (random_num_every_30s) -- run in a parallel thread
+    log(LOG_NAME, "INFO", "Launching random loop")
+    sched.run (randomloop) -- run in a parallel thread
 
     -- This loop will generate a string minute, and accumulate it in a staging
     -- table; the table's content will be uploaded to the server every hour,
@@ -105,15 +111,18 @@ local function main ()
     -- WARNING: Here the data are timestamped by the device, at acquisition time.
     -- If the device's clock is not set correctly, the data retrieved on the
     -- server will also have incorrect timestamps. 
-    local function string_every_minute()
+    local function stringloop()
         while true do
             local str = "String acquired at " .. os.date()
+            
             log(LOG_NAME, 'INFO', "Accumulating a string")
             helloasset:pushdata("uplink", { String=str, timestamp=os.time() }, 'hourly')
+
             sched.wait(60)
         end
     end
-    sched.run (string_every_minute) -- run in a parallel thread
+    log(LOG_NAME, "INFO", "Launching string loop")
+    sched.run (stringloop) -- run in a parallel thread
 end
 
 sched.run(main)

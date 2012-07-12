@@ -17,8 +17,11 @@ Data send once:
 Data send every 30s
 
 * *Message Count* : A variable that count the number of connection to the portal. Start at 0 when the application is launched and will always increase.
-* *Floating Point* : A random decimal number generated before each communication
-* *String* : the "Hello Airvantage" constant string
+* *Floating Point* : A random decimal number generated before each communication.
+
+Data collected every minute and send every hour
+
+* *String* : the "String acquired at <timestamp>"  string, every hour the sample send 60 string timestamped each minutes to the Cloud Platform.
 
 ### Data receive from the AirVantage Cloud Platform
 
