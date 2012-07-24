@@ -107,7 +107,7 @@ local function main ()
     -- server will also have incorrect timestamps. 
     local function string_every_minute()
         while true do
-            local str = "String acquired at "+os.date()
+            local str = "String acquired at " .. os.date()
             log(LOG_NAME, 'INFO', "Accumulating a string")
             helloasset:pushdata("uplink", { String=str, timestamp=os.time() }, 'hourly')
             sched.wait(60)
