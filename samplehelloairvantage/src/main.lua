@@ -90,6 +90,7 @@ local function main ()
             local num = math.random()
             log(LOG_NAME, 'INFO', "Uploading FloatingPoint = %i", num)
             helloasset:pushdata("uplink.FloatingPoint", num, 'now')
+            sched.wait(30)
         end
     end
     sched.run (random_num_every_30s) -- run in a parallel thread
@@ -109,6 +110,7 @@ local function main ()
             local str = "String acquired at "+os.date()
             log(LOG_NAME, 'INFO', "Accumulating a string")
             helloasset:pushdata("uplink", { String=str, timestamp=os.time() }, 'hourly')
+            sched.wait(60)
         end
     end
     sched.run (string_every_minute) -- run in a parallel thread
